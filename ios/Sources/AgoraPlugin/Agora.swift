@@ -30,7 +30,7 @@ import UIKit
     let frameRate = options["frameRate"] as? Int ?? AgoraVideoFrameRate.fps30.rawValue
     let bitrate = options["bitrate"] as? Int ?? AgoraVideoBitrateStandard
     let orientationMode = AgoraVideoOutputOrientationMode(rawValue: options["orientationMode"] as? Int ?? AgoraVideoOutputOrientationMode.adaptative.rawValue) ?? .adaptative
-    let mirrorMode = AgoraVideoMirrorMode(rawValue: options["mirrorMode"] as? Int ?? AgoraVideoMirrorMode.auto.rawValue) ?? .auto
+    let mirrorMode = AgoraVideoMirrorMode(rawValue: UInt(options["mirrorMode"] as? Int ?? Int(AgoraVideoMirrorMode.auto.rawValue))) ?? .auto
 
     let config = AgoraVideoEncoderConfiguration(
       size: AgoraVideoDimension1920x1080,
