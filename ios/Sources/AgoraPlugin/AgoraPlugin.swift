@@ -7,10 +7,9 @@ public class AgoraPlugin: CAPPlugin, CAPBridgedPlugin {
   public let jsName = "Agora"
   public let pluginMethods: [CAPPluginMethod] = [
     CAPPluginMethod(name: "echo", returnType: CAPPluginReturnPromise),
-    CAPPluginMethod(name: "initialize", returnType: CAPPluginReturnPromise)
+    CAPPluginMethod(name: "initialize", returnType: CAPPluginReturnPromise),
     CAPPluginMethod(name: "createMicrophoneAndCameraTracks", returnType: CAPPluginReturnPromise),
-    CAPPluginMethod(name: "setupLocalVideo", returnType: CAPPluginReturnPromise),
-    CAPPluginMethod(name: "startPreview", returnType: CAPPluginReturnPromise)
+    CAPPluginMethod(name: "setupLocalVideoAndPreview", returnType: CAPPluginReturnPromise)
   ]
 
   private let implementation = Agora()
@@ -43,8 +42,8 @@ public class AgoraPlugin: CAPPlugin, CAPBridgedPlugin {
     }
   }
 
-  
-  @objc func setupLocalVideo(_ call: CAPPluginCall) {
+    
+  @objc func setupLocalVideoAndPreview(_ call: CAPPluginCall) {
     guard let rawOptions = call.options as? [String: Any] else {
       call.reject("Invalid options")
       return
@@ -55,16 +54,7 @@ public class AgoraPlugin: CAPPlugin, CAPBridgedPlugin {
       return
     }
 
-    let result = implementation.setupLocalVideo(options: rawOptions, webView: webView)
-    if result.contains("completed") {
-      call.resolve(["message": result])
-    } else {
-      call.reject(result)
-    }
-  }
-
-  @objc func startPreview(_ call: CAPPluginCall) {
-    let result = implementation.startPreview()
+    let result = implementation.setupLocalVideoAndPreview(options: rawOptions, webView: webView)
     if result.contains("started") {
       call.resolve(["message": result])
     } else {

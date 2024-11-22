@@ -47,7 +47,7 @@ import UIKit
     return "Microphone and camera tracks created successfully"
   }
 
-  @objc public func setupLocalVideo(options: [String: Any], webView: UIView) -> String {
+  @objc public func setupLocalVideoAndPreview(options: [String: Any], webView: UIView) -> String {
     guard let rtcEngine = rtcEngine else {
       return "Agora not initialized"
     }
@@ -63,36 +63,34 @@ import UIKit
     // Logs pour le débogage
     print("setupLocalVideo called with uid: \(uid), left: \(left), top: \(top), width: \(width), height: \(height)")
 
-    // Configuration de la vue vidéo
-    let videoFrame = CGRect(x: left, y: top, width: width, height: height)
-    videoView = UIView(frame: videoFrame)
-    videoView?.backgroundColor = .clear
+    DispatchQueue.main.async {
+      // Configuration de la vue vidéo
+      let videoFrame = CGRect(x: left, y: top, width: width, height: height)
+      self.videoView = UIView(frame: videoFrame)
+      self.videoView?.backgroundColor = .clear
 
-    // Ajoute la vue vidéo derrière la WebView
-    originalBackgroundColor = webView.backgroundColor
-    webView.backgroundColor = .clear
-    webView.superview?.insertSubview(videoView!, belowSubview: webView)
+      // Ajoute la vue vidéo derrière la WebView
+      self.originalBackgroundColor = webView.backgroundColor
+      webView.backgroundColor = .clear
+      webView.superview?.insertSubview(self.videoView!, belowSubview: webView)
 
-    // Configuration d'Agora
-    let videoCanvas = AgoraRtcVideoCanvas()
-    videoCanvas.uid = UInt(uid)
-    videoCanvas.view = videoView
-    videoCanvas.renderMode = .hidden
-    videoCanvas.mirrorMode = .auto
+      // Configuration d'Agora
+      let videoCanvas = AgoraRtcVideoCanvas()
+      videoCanvas.uid = UInt(uid)
+      videoCanvas.view = self.videoView
+      videoCanvas.renderMode = .hidden
+      videoCanvas.mirrorMode = .auto
 
-    rtcEngine.setupLocalVideo(videoCanvas)
+      rtcEngine.setupLocalVideo(videoCanvas)
 
-    print("Local video setup completed for uid: \(uid)")
-    return "Local video setup completed"
-  }
-
-
-  @objc public func startPreview() -> String {
-    guard let rtcEngine = rtcEngine else {
-      return "Agora not initialized"
+      print("Local video setup completed for uid: \(uid)")
     }
+
+    // Démarrage de l'aperçu vidéo
     rtcEngine.startPreview()
-    return "Preview started"
+    print("Preview started")
+
+    return "Local video setup and preview started"
   }
 
 }
