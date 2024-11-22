@@ -5,91 +5,58 @@ import UIKit
 @objc public class Agora: NSObject {
   private var rtcEngine: AgoraRtcEngineKit?
   private var videoView: UIView?
-  private var originalBackgroundColor: UIColor?
 
   @objc public func initialize(appId: String) -> String {
     if appId.isEmpty {
       return "Invalid App ID"
     }
-
     rtcEngine = AgoraRtcEngineKit.sharedEngine(withAppId: appId, delegate: nil)
-    if rtcEngine != nil {
-      print("rtcEngine initialized")
-      return "Agora initialized successfully"
-    } else {
-      print("rtcEngine initialization failed")
-      return "Agora initialization failed"
-    }
-
-    print("rtcEngine initialized")
-    return "Agora initialized successfully"
+    return rtcEngine != nil ? "Agora initialized successfully" : "Agora initialization failed"
   }
 
-  @objc public func createMicrophoneAndCameraTracks(options: [String: Any]) -> String {
-    guard let rtcEngine = rtcEngine else {
-      return "Agora not initialized"
-    }
+  @objc public func createMicrophoneAndCameraTracks() -> String {
+    guard let rtcEngine = rtcEngine else { return "Agora not initialized" }
 
-    let frameRate = options["frameRate"] as? Int ?? AgoraVideoFrameRate.fps30.rawValue
-    let bitrate = options["bitrate"] as? Int ?? AgoraVideoBitrateStandard
-    let orientationMode = AgoraVideoOutputOrientationMode(rawValue: options["orientationMode"] as? Int ?? AgoraVideoOutputOrientationMode.adaptative.rawValue) ?? .adaptative
-    let mirrorMode = AgoraVideoMirrorMode(rawValue: UInt(options["mirrorMode"] as? Int ?? Int(AgoraVideoMirrorMode.auto.rawValue))) ?? .auto
+    rtcEngine.enableVideo()
+    rtcEngine.enableAudio()
 
     let config = AgoraVideoEncoderConfiguration(
       size: AgoraVideoDimension1920x1080,
-      frameRate: AgoraVideoFrameRate(rawValue: frameRate) ?? .fps30,
-      bitrate: bitrate,
-      orientationMode: orientationMode,
-      mirrorMode: mirrorMode
+      frameRate: .fps30,
+      bitrate: AgoraVideoBitrateStandard,
+      orientationMode: .adaptative
     )
-
     rtcEngine.setVideoEncoderConfiguration(config)
-    rtcEngine.enableVideo()
     rtcEngine.startPreview()
-
     return "Microphone and camera tracks created successfully"
   }
 
-  @objc public func setupLocalVideoAndPreview(options: [String: Any], webView: UIView) -> String {
-    guard let rtcEngine = rtcEngine else {
-      return "Agora not initialized"
-    }
-
-    guard let uid = options["uid"] as? Int,
-          let left = options["left"] as? CGFloat,
-          let top = options["top"] as? CGFloat,
-          let width = options["width"] as? CGFloat,
-          let height = options["height"] as? CGFloat else {
-      return "Invalid arguments"
-    }
+  @objc public func setupLocalVideoAndPreview(webView: UIView) -> String {
+    guard let rtcEngine = rtcEngine else { return "Agora not initialized" }
 
     DispatchQueue.main.async {
-      let videoFrame = CGRect(x: left, y: top, width: width, height: height)
-      print("Video frame dimensions:", videoFrame)
-
-      self.videoView = UIView(frame: videoFrame)
-      self.videoView?.backgroundColor = .clear
+      // Configure la vue vidéo pour Agora
+      self.videoView = UIView(frame: webView.bounds)
+      self.videoView?.backgroundColor = .black // Fond noir pour la caméra
+      self.videoView?.layer.zPosition = -1 // Place derrière la WebView
+      
+      // Configure la WebView
       webView.isOpaque = false
       webView.backgroundColor = .clear
+      webView.layer.zPosition = 0
 
-      if let superview = webView.superview {
-        superview.insertSubview(self.videoView!, belowSubview: webView)
-      } else {
-        print("WebView superview not available")
-      }
+      // Ajoute la vue vidéo derrière la WebView
+      webView.superview?.insertSubview(self.videoView!, belowSubview: webView)
 
+      // Configure Agora avec la vue vidéo
       let videoCanvas = AgoraRtcVideoCanvas()
-      videoCanvas.uid = UInt(uid)
+      videoCanvas.uid = 0 // UID local
       videoCanvas.view = self.videoView
       videoCanvas.renderMode = .hidden
-
       rtcEngine.setupLocalVideo(videoCanvas)
-      print("Local video setup completed for uid: \(uid)")
     }
 
     rtcEngine.startPreview()
-    print("Preview started")
     return "Local video setup and preview started"
   }
-
 }

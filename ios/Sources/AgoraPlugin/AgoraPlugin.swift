@@ -29,12 +29,7 @@ public class AgoraPlugin: CAPPlugin, CAPBridgedPlugin {
   }
 
   @objc func createMicrophoneAndCameraTracks(_ call: CAPPluginCall) {
-    guard let rawOptions = call.options as? [String: Any] else {
-      call.reject("Invalid options")
-      return
-    }
-
-    let result = implementation.createMicrophoneAndCameraTracks(options: rawOptions)
+    let result = implementation.createMicrophoneAndCameraTracks()
     if result.contains("successfully") {
       call.resolve(["message": result])
     } else {
@@ -42,24 +37,19 @@ public class AgoraPlugin: CAPPlugin, CAPBridgedPlugin {
     }
   }
 
-    
   @objc func setupLocalVideoAndPreview(_ call: CAPPluginCall) {
-    guard let rawOptions = call.options as? [String: Any] else {
-      call.reject("Invalid options")
-      return
-    }
-
     guard let webView = self.bridge?.webView else {
       call.reject("WebView not available")
       return
     }
 
-    let result = implementation.setupLocalVideoAndPreview(options: rawOptions, webView: webView)
+    let result = implementation.setupLocalVideoAndPreview(webView: webView)
     if result.contains("started") {
       call.resolve(["message": result])
     } else {
       call.reject(result)
     }
   }
+
 
 }
