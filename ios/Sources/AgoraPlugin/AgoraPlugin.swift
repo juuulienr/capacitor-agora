@@ -12,13 +12,6 @@ public class AgoraPlugin: CAPPlugin, CAPBridgedPlugin {
 
   private let implementation = Agora()
 
-  @objc func echo(_ call: CAPPluginCall) {
-    let value = call.getString("value") ?? ""
-    call.resolve([
-      "value": implementation.echo(value)
-    ])
-  }
-
   @objc func initialize(_ call: CAPPluginCall) {
     guard let appId = call.getString("appId") else {
       call.reject("Invalid App ID")
@@ -32,4 +25,48 @@ public class AgoraPlugin: CAPPlugin, CAPBridgedPlugin {
       call.reject(result)
     }
   }
+
+  @objc func createMicrophoneAndCameraTracks(_ call: CAPPluginCall) {
+    guard let options = call.options else {
+    call.reject("Invalid options")
+    return
+    }
+
+    let result = implementation.createMicrophoneAndCameraTracks(options: options)
+    if result.contains("successfully") {
+    call.resolve(["message": result])
+    } else {
+    call.reject(result)
+    }
+  }  
+  
+  @objc func setupLocalVideo(_ call: CAPPluginCall) {
+    guard let options = call.options else {
+      call.reject("Invalid options")
+      return
+    }
+
+    // Passe la WebView actuelle comme paramètre
+    guard let webView = self.bridge?.webView else {
+      call.reject("WebView not available")
+      return
+    }
+
+    let result = implementation.setupLocalVideo(options: options, webView: webView)
+    if result.contains("completed") {
+      call.resolve(["message": result])
+    } else {
+      call.reject(result)
+    }
+  }
+
+  @objc func startPreview(_ call: CAPPluginCall) {
+    let result = implementation.startPreview()
+    if result.contains("started") {
+      call.resolve(["message": result])
+    } else {
+      call.reject(result)
+    }
+  }
+
 }
