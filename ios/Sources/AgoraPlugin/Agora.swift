@@ -20,6 +20,9 @@ import UIKit
       print("rtcEngine initialization failed")
       return "Agora initialization failed"
     }
+
+    print("rtcEngine initialized")
+    return "Agora initialized successfully"
   }
 
   @objc public func createMicrophoneAndCameraTracks(options: [String: Any]) -> String {
@@ -60,36 +63,32 @@ import UIKit
       return "Invalid arguments"
     }
 
-    // Logs pour le débogage
-    print("setupLocalVideo called with uid: \(uid), left: \(left), top: \(top), width: \(width), height: \(height)")
-
     DispatchQueue.main.async {
-      // Configuration de la vue vidéo
       let videoFrame = CGRect(x: left, y: top, width: width, height: height)
+      print("Video frame dimensions:", videoFrame)
+
       self.videoView = UIView(frame: videoFrame)
       self.videoView?.backgroundColor = .clear
-
-      // Ajoute la vue vidéo derrière la WebView
-      self.originalBackgroundColor = webView.backgroundColor
+      webView.isOpaque = false
       webView.backgroundColor = .clear
-      webView.superview?.insertSubview(self.videoView!, belowSubview: webView)
 
-      // Configuration d'Agora
+      if let superview = webView.superview {
+        superview.insertSubview(self.videoView!, belowSubview: webView)
+      } else {
+        print("WebView superview not available")
+      }
+
       let videoCanvas = AgoraRtcVideoCanvas()
       videoCanvas.uid = UInt(uid)
       videoCanvas.view = self.videoView
       videoCanvas.renderMode = .hidden
-      videoCanvas.mirrorMode = .auto
 
       rtcEngine.setupLocalVideo(videoCanvas)
-
       print("Local video setup completed for uid: \(uid)")
     }
 
-    // Démarrage de l'aperçu vidéo
     rtcEngine.startPreview()
     print("Preview started")
-
     return "Local video setup and preview started"
   }
 
