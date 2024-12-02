@@ -18,6 +18,8 @@ npx cap sync
 * [`joinChannel(...)`](#joinchannel)
 * [`switchCamera()`](#switchcamera)
 * [`leaveChannel()`](#leavechannel)
+* [`enableWebViewTransparency()`](#enablewebviewtransparency)
+* [`disableWebViewTransparency()`](#disablewebviewtransparency)
 
 </docgen-index>
 
@@ -30,9 +32,11 @@ npx cap sync
 initialize(options: { appId: string; }) => Promise<void>
 ```
 
-| Param         | Type                            |
-| ------------- | ------------------------------- |
-| **`options`** | <code>{ appId: string; }</code> |
+Initialise le SDK Agora avec l'App ID.
+
+| Param         | Type                            | Description                       |
+| ------------- | ------------------------------- | --------------------------------- |
+| **`options`** | <code>{ appId: string; }</code> | - Les options contenant l'App ID. |
 
 --------------------
 
@@ -43,6 +47,8 @@ initialize(options: { appId: string; }) => Promise<void>
 setupLocalVideo() => Promise<void>
 ```
 
+Configure et affiche la vidéo locale.
+
 --------------------
 
 
@@ -52,9 +58,11 @@ setupLocalVideo() => Promise<void>
 joinChannel(options: { channelName: string; token: string | null; uid: number; }) => Promise<void>
 ```
 
-| Param         | Type                                                                      |
-| ------------- | ------------------------------------------------------------------------- |
-| **`options`** | <code>{ channelName: string; token: string \| null; uid: number; }</code> |
+Rejoint un canal Agora avec les informations fournies.
+
+| Param         | Type                                                                      | Description                                                  |
+| ------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| **`options`** | <code>{ channelName: string; token: string \| null; uid: number; }</code> | - Les options contenant le nom du canal, le token, et l'UID. |
 
 --------------------
 
@@ -65,6 +73,8 @@ joinChannel(options: { channelName: string; token: string | null; uid: number; }
 switchCamera() => Promise<void>
 ```
 
+Permet de basculer entre les caméras (avant/arrière).
+
 --------------------
 
 
@@ -73,6 +83,30 @@ switchCamera() => Promise<void>
 ```typescript
 leaveChannel() => Promise<void>
 ```
+
+Quitte le canal actuel et libère les ressources.
+
+--------------------
+
+
+### enableWebViewTransparency()
+
+```typescript
+enableWebViewTransparency() => Promise<void>
+```
+
+Active la transparence de la WebView pour afficher les éléments en arrière-plan.
+
+--------------------
+
+
+### disableWebViewTransparency()
+
+```typescript
+disableWebViewTransparency() => Promise<void>
+```
+
+Désactive la transparence de la WebView.
 
 --------------------
 

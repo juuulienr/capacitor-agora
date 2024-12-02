@@ -11,13 +11,18 @@
         "parameters": [
           {
             "name": "options",
-            "docs": "",
+            "docs": "- Les options contenant l'App ID.",
             "type": "{ appId: string; }"
           }
         ],
         "returns": "Promise<void>",
-        "tags": [],
-        "docs": "",
+        "tags": [
+          {
+            "name": "param",
+            "text": "options - Les options contenant l'App ID."
+          }
+        ],
+        "docs": "Initialise le SDK Agora avec l'App ID.",
         "complexTypes": [],
         "slug": "initialize"
       },
@@ -27,7 +32,7 @@
         "parameters": [],
         "returns": "Promise<void>",
         "tags": [],
-        "docs": "",
+        "docs": "Configure et affiche la vidéo locale.",
         "complexTypes": [],
         "slug": "setuplocalvideo"
       },
@@ -37,13 +42,18 @@
         "parameters": [
           {
             "name": "options",
-            "docs": "",
+            "docs": "- Les options contenant le nom du canal, le token, et l'UID.",
             "type": "{ channelName: string; token: string | null; uid: number; }"
           }
         ],
         "returns": "Promise<void>",
-        "tags": [],
-        "docs": "",
+        "tags": [
+          {
+            "name": "param",
+            "text": "options - Les options contenant le nom du canal, le token, et l'UID."
+          }
+        ],
+        "docs": "Rejoint un canal Agora avec les informations fournies.",
         "complexTypes": [],
         "slug": "joinchannel"
       },
@@ -53,7 +63,7 @@
         "parameters": [],
         "returns": "Promise<void>",
         "tags": [],
-        "docs": "",
+        "docs": "Permet de basculer entre les caméras (avant/arrière).",
         "complexTypes": [],
         "slug": "switchcamera"
       },
@@ -63,9 +73,29 @@
         "parameters": [],
         "returns": "Promise<void>",
         "tags": [],
-        "docs": "",
+        "docs": "Quitte le canal actuel et libère les ressources.",
         "complexTypes": [],
         "slug": "leavechannel"
+      },
+      {
+        "name": "enableWebViewTransparency",
+        "signature": "() => Promise<void>",
+        "parameters": [],
+        "returns": "Promise<void>",
+        "tags": [],
+        "docs": "Active la transparence de la WebView pour afficher les éléments en arrière-plan.",
+        "complexTypes": [],
+        "slug": "enablewebviewtransparency"
+      },
+      {
+        "name": "disableWebViewTransparency",
+        "signature": "() => Promise<void>",
+        "parameters": [],
+        "returns": "Promise<void>",
+        "tags": [],
+        "docs": "Désactive la transparence de la WebView.",
+        "complexTypes": [],
+        "slug": "disablewebviewtransparency"
       }
     ],
     "properties": []

@@ -1,6 +1,9 @@
 import { WebPlugin } from '@capacitor/core';
 import type { AgoraPlugin } from './definitions';
 export declare class AgoraWeb extends WebPlugin implements AgoraPlugin {
+    private client;
+    private localVideoTrack;
+    private localAudioTrack;
     initialize(options: {
         appId: string;
     }): Promise<void>;
@@ -12,4 +15,6 @@ export declare class AgoraWeb extends WebPlugin implements AgoraPlugin {
     }): Promise<void>;
     switchCamera(): Promise<void>;
     leaveChannel(): Promise<void>;
+    enableWebViewTransparency(): Promise<void>;
+    disableWebViewTransparency(): Promise<void>;
 }
