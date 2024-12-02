@@ -18,22 +18,39 @@ import AgoraRtcKit
         }
 
         DispatchQueue.main.async {
+            // Supprime toute vue existante
             self.localVideoView?.removeFromSuperview()
-            self.localVideoView = UIView(frame: parentView.bounds)
-            self.localVideoView?.backgroundColor = .black
-            parentView.insertSubview(self.localVideoView!, at: 0)
+            print("[Agora] Removed existing localVideoView")
 
+            // Configure la nouvelle vue pour la vidéo locale
+            self.localVideoView = UIView(frame: parentView.bounds)
+            self.localVideoView?.backgroundColor = .clear
+            self.localVideoView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+
+            // Ajoute la vue en arrière-plan
+            parentView.insertSubview(self.localVideoView!, at: 0)
+            print("[Agora] Inserted localVideoView behind ParentView content")
+
+            // Configure le rendu Agora
             let videoCanvas = AgoraRtcVideoCanvas()
             videoCanvas.view = self.localVideoView
             videoCanvas.renderMode = .hidden
             videoCanvas.uid = 0
             agoraKit.setupLocalVideo(videoCanvas)
+            print("[Agora] Configured Agora video canvas")
+
+            // Démarre la prévisualisation
+            agoraKit.enableVideo()
+            agoraKit.startPreview()
+            print("[Agora] Video preview started")
         }
     }
 
     public func enableWebViewTransparency(for webView: UIView) {
         webView.isOpaque = false
         webView.backgroundColor = .clear
+        webView.scrollView.backgroundColor = .clear
+        print("[Agora] WebView transparency enabled")
     }
 
     public func disableWebViewTransparency(for webView: UIView) {
