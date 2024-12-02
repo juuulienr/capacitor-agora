@@ -13,24 +13,66 @@ npx cap sync
 
 <docgen-index>
 
-* [`echo(...)`](#echo)
+* [`initialize(...)`](#initialize)
+* [`setupLocalVideo()`](#setuplocalvideo)
+* [`joinChannel(...)`](#joinchannel)
+* [`switchCamera()`](#switchcamera)
+* [`leaveChannel()`](#leavechannel)
 
 </docgen-index>
 
 <docgen-api>
 <!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
 
-### echo(...)
+### initialize(...)
 
 ```typescript
-echo(options: { value: string; }) => Promise<{ value: string; }>
+initialize(options: { appId: string; }) => Promise<void>
 ```
 
 | Param         | Type                            |
 | ------------- | ------------------------------- |
-| **`options`** | <code>{ value: string; }</code> |
+| **`options`** | <code>{ appId: string; }</code> |
 
-**Returns:** <code>Promise&lt;{ value: string; }&gt;</code>
+--------------------
+
+
+### setupLocalVideo()
+
+```typescript
+setupLocalVideo() => Promise<void>
+```
+
+--------------------
+
+
+### joinChannel(...)
+
+```typescript
+joinChannel(options: { channelName: string; token: string | null; uid: number; }) => Promise<void>
+```
+
+| Param         | Type                                                                      |
+| ------------- | ------------------------------------------------------------------------- |
+| **`options`** | <code>{ channelName: string; token: string \| null; uid: number; }</code> |
+
+--------------------
+
+
+### switchCamera()
+
+```typescript
+switchCamera() => Promise<void>
+```
+
+--------------------
+
+
+### leaveChannel()
+
+```typescript
+leaveChannel() => Promise<void>
+```
 
 --------------------
 

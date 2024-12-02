@@ -6,20 +6,66 @@
     "tags": [],
     "methods": [
       {
-        "name": "echo",
-        "signature": "(options: { value: string; }) => Promise<{ value: string; }>",
+        "name": "initialize",
+        "signature": "(options: { appId: string; }) => Promise<void>",
         "parameters": [
           {
             "name": "options",
             "docs": "",
-            "type": "{ value: string; }"
+            "type": "{ appId: string; }"
           }
         ],
-        "returns": "Promise<{ value: string; }>",
+        "returns": "Promise<void>",
         "tags": [],
         "docs": "",
         "complexTypes": [],
-        "slug": "echo"
+        "slug": "initialize"
+      },
+      {
+        "name": "setupLocalVideo",
+        "signature": "() => Promise<void>",
+        "parameters": [],
+        "returns": "Promise<void>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [],
+        "slug": "setuplocalvideo"
+      },
+      {
+        "name": "joinChannel",
+        "signature": "(options: { channelName: string; token: string | null; uid: number; }) => Promise<void>",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "{ channelName: string; token: string | null; uid: number; }"
+          }
+        ],
+        "returns": "Promise<void>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [],
+        "slug": "joinchannel"
+      },
+      {
+        "name": "switchCamera",
+        "signature": "() => Promise<void>",
+        "parameters": [],
+        "returns": "Promise<void>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [],
+        "slug": "switchcamera"
+      },
+      {
+        "name": "leaveChannel",
+        "signature": "() => Promise<void>",
+        "parameters": [],
+        "returns": "Promise<void>",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [],
+        "slug": "leavechannel"
       }
     ],
     "properties": []
