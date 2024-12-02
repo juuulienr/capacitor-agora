@@ -1,3 +1,7 @@
 export interface AgoraPlugin {
-  echo(options: { value: string }): Promise<{ value: string }>;
+  initialize(options: { appId: string }): Promise<void>;
+  setupLocalVideo(): Promise<void>;
+  joinChannel(options: { channelName: string; token: string | null; uid: number }): Promise<void>;
+  switchCamera(): Promise<void>;
+  leaveChannel(): Promise<void>;
 }
