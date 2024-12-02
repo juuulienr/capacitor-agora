@@ -16,17 +16,32 @@ export class AgoraWeb extends WebPlugin {
         if (!AgoraRTC) {
             throw new Error('[AgoraWeb] AgoraRTC is not available.');
         }
-        // Création des pistes vidéo et audio locales
-        this.localVideoTrack = await AgoraRTC.createCameraVideoTrack();
-        this.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
-        // Lecture de la vidéo locale dans un conteneur DOM
-        const container = document.createElement('div');
-        container.id = 'local-video';
-        container.style.width = '100%';
-        container.style.height = '100%';
-        document.body.appendChild(container);
-        this.localVideoTrack.play('local-video');
-        console.log('[AgoraWeb] Local video track started');
+        try {
+            // Vérifie si l'élément avec la classe 'livestream' existe
+            const livestreamContainer = document.querySelector('.livestream');
+            if (!livestreamContainer) {
+                throw new Error('[AgoraWeb] No element found with class "livestream". Ensure it exists in the DOM.');
+            }
+            // Création des pistes vidéo et audio locales
+            this.localVideoTrack = await AgoraRTC.createCameraVideoTrack();
+            this.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+            console.log('[AgoraWeb] Local video and audio tracks created');
+            // Crée un conteneur pour la vidéo locale
+            const videoContainer = document.createElement('div');
+            videoContainer.id = 'local-video';
+            videoContainer.style.width = '100%';
+            videoContainer.style.height = '100%';
+            // Ajoute le conteneur vidéo à la div avec la classe "livestream"
+            livestreamContainer.appendChild(videoContainer);
+            console.log('[AgoraWeb] Video container added to .livestream');
+            // Lecture de la vidéo locale dans le conteneur
+            this.localVideoTrack.play('local-video');
+            console.log('[AgoraWeb] Local video track started');
+        }
+        catch (error) {
+            console.error('[AgoraWeb] Error in setupLocalVideo:', error);
+            throw error;
+        }
     }
     async joinChannel(options) {
         console.log('[AgoraWeb] joinChannel called with options:', options);
