@@ -25,11 +25,19 @@ public class AgoraPlugin: CAPPlugin {
         return
       }
 
+      // Assurez-vous que bridge et viewController ne sont pas nil
+      guard let bridge = self.bridge,
+            let viewController = bridge.viewController,
+            let view = viewController.view else {
+        call.reject("Unable to access viewController or view")
+        return
+      }
+
       // Crée une vue pour la vidéo locale
-      let bounds = self.bridge.viewController.view.bounds
+      let bounds = view.bounds
       self.localVideoView = UIView(frame: bounds)
       self.localVideoView?.backgroundColor = .black
-      self.bridge.viewController.view.insertSubview(self.localVideoView!, at: 0)
+      view.insertSubview(self.localVideoView!, at: 0)
 
       let videoCanvas = AgoraRtcVideoCanvas()
       videoCanvas.view = self.localVideoView
@@ -44,10 +52,13 @@ public class AgoraPlugin: CAPPlugin {
   // Rendre la WebView transparente
   @objc func enableWebViewTransparency(_ call: CAPPluginCall) {
     DispatchQueue.main.async {
-      if let webView = self.bridge.webView {
-        webView.isOpaque = false
-        webView.backgroundColor = .clear
+      guard let bridge = self.bridge,
+            let webView = bridge.webView else {
+        call.reject("Unable to access webView")
+        return
       }
+      webView.isOpaque = false
+      webView.backgroundColor = .clear
       call.resolve()
     }
   }
@@ -55,10 +66,13 @@ public class AgoraPlugin: CAPPlugin {
   // Désactiver la transparence de la WebView
   @objc func disableWebViewTransparency(_ call: CAPPluginCall) {
     DispatchQueue.main.async {
-      if let webView = self.bridge.webView {
-        webView.isOpaque = true
-        webView.backgroundColor = .white // Couleur par défaut de fond
+      guard let bridge = self.bridge,
+            let webView = bridge.webView else {
+        call.reject("Unable to access webView")
+        return
       }
+      webView.isOpaque = true
+      webView.backgroundColor = .white // Couleur par défaut
       call.resolve()
     }
   }
