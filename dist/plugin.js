@@ -15,9 +15,6 @@ var capacitorAgora = (function (exports, core) {
             // Création d'un client Agora
             this.client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
             console.log('[AgoraWeb] AgoraRTC client created');
-            // Initialise Agora avec l'App ID
-            await this.client.initialize(options.appId);
-            console.log('[AgoraWeb] AgoraRTC client initialized with App ID:', options.appId);
         }
         async setupLocalVideo() {
             console.log('[AgoraWeb] setupLocalVideo called');
