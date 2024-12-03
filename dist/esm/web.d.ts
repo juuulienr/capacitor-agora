@@ -4,6 +4,7 @@ export declare class AgoraWeb extends WebPlugin implements AgoraPlugin {
     private client;
     private localVideoTrack;
     private localAudioTrack;
+    private appId;
     initialize(options: {
         appId: string;
     }): Promise<void>;

@@ -7,12 +7,20 @@ const Agora = core.registerPlugin('Agora', {
 });
 
 class AgoraWeb extends core.WebPlugin {
+    constructor() {
+        super(...arguments);
+        this.appId = null;
+    }
     async initialize(options) {
         console.log('[AgoraWeb] initialize called with options:', options);
         const AgoraRTC = window.AgoraRTC;
         if (!AgoraRTC) {
             throw new Error('[AgoraWeb] AgoraRTC is not available. Ensure you included the AgoraRTC script.');
         }
+        if (!options.appId) {
+            throw new Error('App ID is required');
+        }
+        this.appId = options.appId;
         // Création d'un client Agora
         this.client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
         console.log('[AgoraWeb] AgoraRTC client created');
@@ -55,8 +63,13 @@ class AgoraWeb extends core.WebPlugin {
         if (!this.client) {
             throw new Error('[AgoraWeb] Client is not initialized. Call initialize() first.');
         }
+        if (!this.appId) {
+            throw new Error('App ID is not initialized. Call initialize() first.');
+        }
         // Rejoindre un canal avec le client et les pistes locales
-        await this.client.join(options.token, options.channelName, options.uid);
+        await this.client.setClientRole('host');
+        console.log('Client role set to broadcaster.');
+        await this.client.join(this.appId, options.channelName, options.token, options.uid);
         console.log('[AgoraWeb] Joined channel:', options.channelName);
         if (this.localAudioTrack && this.localVideoTrack) {
             await this.client.publish([this.localAudioTrack, this.localVideoTrack]);
@@ -65,11 +78,8 @@ class AgoraWeb extends core.WebPlugin {
     }
     async switchCamera() {
         console.log('[AgoraWeb] switchCamera called');
-        if (!this.localVideoTrack) {
-            throw new Error('[AgoraWeb] Local video track is not initialized.');
-        }
-        await this.localVideoTrack.setDevice('next');
-        console.log('[AgoraWeb] Camera switched');
+        // Implémentation Web spécifique si applicable
+        throw this.unimplemented('[AgoraWeb] switchCamera is not implemented on the web.');
     }
     async leaveChannel() {
         console.log('[AgoraWeb] leaveChannel called');
