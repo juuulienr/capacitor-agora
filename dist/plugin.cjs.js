@@ -22,7 +22,7 @@ class AgoraWeb extends core.WebPlugin {
         }
         this.appId = options.appId;
         // Création d'un client Agora avec la configuration recommandée
-        this.client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
+        this.client = AgoraRTC.createClient({ mode: 'live', codec: 'vp8' });
         console.log('[AgoraWeb] AgoraRTC client created');
     }
     async setupLocalVideo() {
@@ -38,7 +38,7 @@ class AgoraWeb extends core.WebPlugin {
             }
             // Création des pistes vidéo et audio locales avec résolution maximale
             this.localVideoTrack = await AgoraRTC.createCameraVideoTrack({
-                encoderConfig: 'high_quality' // Résolution maximale pour la vidéo
+                encoderConfig: '1080p'
             });
             this.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
             console.log('[AgoraWeb] Local video and audio tracks created with high resolution');
@@ -59,18 +59,31 @@ class AgoraWeb extends core.WebPlugin {
     async joinChannel(options) {
         console.log('[AgoraWeb] joinChannel called with options:', options);
         if (!this.client) {
-            throw new Error('[AgoraWeb] Client is not initialized. Call initialize() first.');
+            console.error('[AgoraWeb] Client is not initialized. Call initialize() first.');
+            throw new Error('Client is not initialized. Call initialize() first.');
         }
         if (!this.appId) {
+            console.error('[AgoraWeb] App ID is not initialized. Call initialize() first.');
             throw new Error('App ID is not initialized. Call initialize() first.');
         }
+        console.log('[AgoraWeb] Debugging joinChannel variables:');
+        console.log('App ID:', this.appId);
+        console.log('Channel Name:', options.channelName);
+        console.log('Token:', options.token);
+        console.log('UID:', options.uid);
         await this.client.setClientRole('host');
         console.log('[AgoraWeb] Client role set to host.');
-        await this.client.join(this.appId, options.channelName, options.token, options.uid);
-        console.log('[AgoraWeb] Joined channel:', options.channelName);
-        if (this.localAudioTrack && this.localVideoTrack) {
-            await this.client.publish([this.localAudioTrack, this.localVideoTrack]);
-            console.log('[AgoraWeb] Local audio and video tracks published');
+        try {
+            await this.client.join(this.appId, options.channelName, options.token, options.uid);
+            console.log('[AgoraWeb] Successfully joined channel:', options.channelName);
+            if (this.localAudioTrack && this.localVideoTrack) {
+                await this.client.publish([this.localAudioTrack, this.localVideoTrack]);
+                console.log('[AgoraWeb] Local audio and video tracks published');
+            }
+        }
+        catch (error) {
+            console.error('[AgoraWeb] Error while joining channel:', error);
+            throw error;
         }
     }
     async switchCamera() {
