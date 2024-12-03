@@ -11,8 +11,6 @@ public class AgoraPlugin: CAPPlugin, CAPBridgedPlugin {
     public let pluginMethods: [CAPPluginMethod] = [
         CAPPluginMethod(name: "initialize", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "setupLocalVideo", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "enableWebViewTransparency", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "disableWebViewTransparency", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "joinChannel", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "switchCamera", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "leaveChannel", returnType: CAPPluginReturnPromise)
@@ -48,30 +46,6 @@ public class AgoraPlugin: CAPPlugin, CAPBridgedPlugin {
             } catch {
                 call.reject("Failed to setup local video", nil, error)
             }
-        }
-    }
-
-    @objc func enableWebViewTransparency(_ call: CAPPluginCall) {
-        DispatchQueue.main.async {
-            guard let bridge = self.bridge,
-                  let webView = bridge.webView else {
-                call.reject("Unable to access webView")
-                return
-            }
-            self.implementation.enableWebViewTransparency(for: webView)
-            call.resolve()
-        }
-    }
-
-    @objc func disableWebViewTransparency(_ call: CAPPluginCall) {
-        DispatchQueue.main.async {
-            guard let bridge = self.bridge,
-                  let webView = bridge.webView else {
-                call.reject("Unable to access webView")
-                return
-            }
-            self.implementation.disableWebViewTransparency(for: webView)
-            call.resolve()
         }
     }
 

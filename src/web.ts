@@ -8,8 +8,6 @@ export class AgoraWeb extends WebPlugin implements AgoraPlugin {
   private appId: string | null = null;
 
   async initialize(options: { appId: string }): Promise<void> {
-    console.log('[AgoraWeb] initialize called with options:', options);
-
     const AgoraRTC = (window as any).AgoraRTC;
     if (!AgoraRTC) {
       throw new Error('[AgoraWeb] AgoraRTC is not available. Ensure you included the AgoraRTC script.');
@@ -20,15 +18,11 @@ export class AgoraWeb extends WebPlugin implements AgoraPlugin {
     }
 
     this.appId = options.appId;
-
-    // Création d'un client Agora avec la configuration recommandée
     this.client = AgoraRTC.createClient({ mode: 'live', codec: 'vp8' });
     console.log('[AgoraWeb] AgoraRTC client created');
   }
 
   async setupLocalVideo(): Promise<void> {
-    console.log('[AgoraWeb] setupLocalVideo called');
-
     const AgoraRTC = (window as any).AgoraRTC;
     if (!AgoraRTC) {
       throw new Error('[AgoraWeb] AgoraRTC is not available.');
@@ -40,12 +34,10 @@ export class AgoraWeb extends WebPlugin implements AgoraPlugin {
         throw new Error('[AgoraWeb] No element found with class "livestream". Ensure it exists in the DOM.');
       }
 
-      // Création des pistes vidéo et audio locales avec résolution maximale
+      this.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
       this.localVideoTrack = await AgoraRTC.createCameraVideoTrack({ 
         encoderConfig: '1080p'
       });
-      this.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
-      console.log('[AgoraWeb] Local video and audio tracks created with high resolution');
 
       const videoContainer = document.createElement('div');
       videoContainer.id = 'local-video';
@@ -53,8 +45,6 @@ export class AgoraWeb extends WebPlugin implements AgoraPlugin {
       videoContainer.style.height = '100%';
 
       livestreamContainer.appendChild(videoContainer);
-      console.log('[AgoraWeb] Video container added to .livestream');
-
       this.localVideoTrack.play('local-video');
       console.log('[AgoraWeb] Local video track started');
     } catch (error) {
@@ -64,28 +54,16 @@ export class AgoraWeb extends WebPlugin implements AgoraPlugin {
   }
 
   async joinChannel(options: { channelName: string; token: string | null; uid: number }): Promise<void> {
-    console.log('[AgoraWeb] joinChannel called with options:', options);
-  
     if (!this.client) {
-      console.error('[AgoraWeb] Client is not initialized. Call initialize() first.');
       throw new Error('Client is not initialized. Call initialize() first.');
     }
   
     if (!this.appId) {
-      console.error('[AgoraWeb] App ID is not initialized. Call initialize() first.');
       throw new Error('App ID is not initialized. Call initialize() first.');
     }
   
-    console.log('[AgoraWeb] Debugging joinChannel variables:');
-    console.log('App ID:', this.appId);
-    console.log('Channel Name:', options.channelName);
-    console.log('Token:', options.token);
-    console.log('UID:', options.uid);
-  
-    await this.client.setClientRole('host');
-    console.log('[AgoraWeb] Client role set to host.');
-  
     try {
+      await this.client.setClientRole('host');
       await this.client.join(this.appId, options.channelName, options.token, options.uid);
       console.log('[AgoraWeb] Successfully joined channel:', options.channelName);
   
@@ -98,27 +76,8 @@ export class AgoraWeb extends WebPlugin implements AgoraPlugin {
       throw error;
     }
   }
-  
-
-  async switchCamera(): Promise<void> {
-    console.log('[AgoraWeb] switchCamera called');
-
-    if (this.localVideoTrack && typeof this.localVideoTrack.switchDevice === 'function') {
-      const devices = await (window as any).AgoraRTC.getCameras();
-      if (devices.length > 1) {
-        await this.localVideoTrack.switchDevice(devices[1].deviceId);
-        console.log('[AgoraWeb] Switched camera');
-      } else {
-        console.warn('[AgoraWeb] No alternative camera available');
-      }
-    } else {
-      console.error('[AgoraWeb] switchCamera is not supported or localVideoTrack is not initialized');
-    }
-  }
 
   async leaveChannel(): Promise<void> {
-    console.log('[AgoraWeb] leaveChannel called');
-
     if (!this.client) {
       throw new Error('[AgoraWeb] Client is not initialized.');
     }
@@ -131,18 +90,19 @@ export class AgoraWeb extends WebPlugin implements AgoraPlugin {
       this.localAudioTrack.stop();
       this.localAudioTrack.close();
     }
+    
+    const localVideoDiv = document.getElementById('local-video');
+    if (localVideoDiv) {
+      localVideoDiv.remove();
+      console.log('[AgoraWeb] Local video div removed');
+    }
 
     await this.client.leave();
     console.log('[AgoraWeb] Left channel');
   }
-
-  async enableWebViewTransparency(): Promise<void> {
-    console.log('[AgoraWeb] enableWebViewTransparency called');
-    throw this.unimplemented('[AgoraWeb] enableWebViewTransparency is not implemented on the web.');
-  }
-
-  async disableWebViewTransparency(): Promise<void> {
-    console.log('[AgoraWeb] disableWebViewTransparency called');
-    throw this.unimplemented('[AgoraWeb] disableWebViewTransparency is not implemented on the web.');
+  
+  async switchCamera(): Promise<void> {
+    console.log('[AgoraWeb] switchCamera called');
+    throw this.unimplemented('[AgoraWeb] switchCamera is not implemented on the web.');
   }
 }

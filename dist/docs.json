@@ -58,16 +58,6 @@
         "slug": "joinchannel"
       },
       {
-        "name": "switchCamera",
-        "signature": "() => Promise<void>",
-        "parameters": [],
-        "returns": "Promise<void>",
-        "tags": [],
-        "docs": "Permet de basculer entre les caméras (avant/arrière).",
-        "complexTypes": [],
-        "slug": "switchcamera"
-      },
-      {
         "name": "leaveChannel",
         "signature": "() => Promise<void>",
         "parameters": [],
@@ -78,24 +68,14 @@
         "slug": "leavechannel"
       },
       {
-        "name": "enableWebViewTransparency",
+        "name": "switchCamera",
         "signature": "() => Promise<void>",
         "parameters": [],
         "returns": "Promise<void>",
         "tags": [],
-        "docs": "Active la transparence de la WebView pour afficher les éléments en arrière-plan.",
+        "docs": "Permet de basculer entre les caméras (avant/arrière).",
         "complexTypes": [],
-        "slug": "enablewebviewtransparency"
-      },
-      {
-        "name": "disableWebViewTransparency",
-        "signature": "() => Promise<void>",
-        "parameters": [],
-        "returns": "Promise<void>",
-        "tags": [],
-        "docs": "Désactive la transparence de la WebView.",
-        "complexTypes": [],
-        "slug": "disablewebviewtransparency"
+        "slug": "switchcamera"
       }
     ],
     "properties": []

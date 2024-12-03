@@ -16,10 +16,8 @@ npx cap sync
 * [`initialize(...)`](#initialize)
 * [`setupLocalVideo()`](#setuplocalvideo)
 * [`joinChannel(...)`](#joinchannel)
-* [`switchCamera()`](#switchcamera)
 * [`leaveChannel()`](#leavechannel)
-* [`enableWebViewTransparency()`](#enablewebviewtransparency)
-* [`disableWebViewTransparency()`](#disablewebviewtransparency)
+* [`switchCamera()`](#switchcamera)
 
 </docgen-index>
 
@@ -67,17 +65,6 @@ Rejoint un canal Agora avec les informations fournies.
 --------------------
 
 
-### switchCamera()
-
-```typescript
-switchCamera() => Promise<void>
-```
-
-Permet de basculer entre les caméras (avant/arrière).
-
---------------------
-
-
 ### leaveChannel()
 
 ```typescript
@@ -89,24 +76,13 @@ Quitte le canal actuel et libère les ressources.
 --------------------
 
 
-### enableWebViewTransparency()
+### switchCamera()
 
 ```typescript
-enableWebViewTransparency() => Promise<void>
+switchCamera() => Promise<void>
 ```
 
-Active la transparence de la WebView pour afficher les éléments en arrière-plan.
-
---------------------
-
-
-### disableWebViewTransparency()
-
-```typescript
-disableWebViewTransparency() => Promise<void>
-```
-
-Désactive la transparence de la WebView.
+Permet de basculer entre les caméras (avant/arrière).
 
 --------------------
 
