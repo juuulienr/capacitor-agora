@@ -20,7 +20,7 @@ var capacitorAgora = (function (exports, core) {
                 throw new Error('App ID is required');
             }
             this.appId = options.appId;
-            // Création d'un client Agora
+            // Création d'un client Agora avec la configuration recommandée
             this.client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
             console.log('[AgoraWeb] AgoraRTC client created');
         }
@@ -31,24 +31,22 @@ var capacitorAgora = (function (exports, core) {
                 throw new Error('[AgoraWeb] AgoraRTC is not available.');
             }
             try {
-                // Vérifie si l'élément avec la classe 'livestream' existe
                 const livestreamContainer = document.querySelector('.livestream');
                 if (!livestreamContainer) {
                     throw new Error('[AgoraWeb] No element found with class "livestream". Ensure it exists in the DOM.');
                 }
-                // Création des pistes vidéo et audio locales
-                this.localVideoTrack = await AgoraRTC.createCameraVideoTrack();
+                // Création des pistes vidéo et audio locales avec résolution maximale
+                this.localVideoTrack = await AgoraRTC.createCameraVideoTrack({
+                    encoderConfig: 'high_quality' // Résolution maximale pour la vidéo
+                });
                 this.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
-                console.log('[AgoraWeb] Local video and audio tracks created');
-                // Crée un conteneur pour la vidéo locale
+                console.log('[AgoraWeb] Local video and audio tracks created with high resolution');
                 const videoContainer = document.createElement('div');
                 videoContainer.id = 'local-video';
                 videoContainer.style.width = '100%';
                 videoContainer.style.height = '100%';
-                // Ajoute le conteneur vidéo à la div avec la classe "livestream"
                 livestreamContainer.appendChild(videoContainer);
                 console.log('[AgoraWeb] Video container added to .livestream');
-                // Lecture de la vidéo locale dans le conteneur
                 this.localVideoTrack.play('local-video');
                 console.log('[AgoraWeb] Local video track started');
             }
@@ -65,9 +63,8 @@ var capacitorAgora = (function (exports, core) {
             if (!this.appId) {
                 throw new Error('App ID is not initialized. Call initialize() first.');
             }
-            // Rejoindre un canal avec le client et les pistes locales
             await this.client.setClientRole('host');
-            console.log('Client role set to broadcaster.');
+            console.log('[AgoraWeb] Client role set to host.');
             await this.client.join(this.appId, options.channelName, options.token, options.uid);
             console.log('[AgoraWeb] Joined channel:', options.channelName);
             if (this.localAudioTrack && this.localVideoTrack) {
@@ -77,15 +74,25 @@ var capacitorAgora = (function (exports, core) {
         }
         async switchCamera() {
             console.log('[AgoraWeb] switchCamera called');
-            // Implémentation Web spécifique si applicable
-            throw this.unimplemented('[AgoraWeb] switchCamera is not implemented on the web.');
+            if (this.localVideoTrack && typeof this.localVideoTrack.switchDevice === 'function') {
+                const devices = await window.AgoraRTC.getCameras();
+                if (devices.length > 1) {
+                    await this.localVideoTrack.switchDevice(devices[1].deviceId);
+                    console.log('[AgoraWeb] Switched camera');
+                }
+                else {
+                    console.warn('[AgoraWeb] No alternative camera available');
+                }
+            }
+            else {
+                console.error('[AgoraWeb] switchCamera is not supported or localVideoTrack is not initialized');
+            }
         }
         async leaveChannel() {
             console.log('[AgoraWeb] leaveChannel called');
             if (!this.client) {
                 throw new Error('[AgoraWeb] Client is not initialized.');
             }
-            // Arrête les pistes locales
             if (this.localVideoTrack) {
                 this.localVideoTrack.stop();
                 this.localVideoTrack.close();
@@ -94,18 +101,15 @@ var capacitorAgora = (function (exports, core) {
                 this.localAudioTrack.stop();
                 this.localAudioTrack.close();
             }
-            // Quitte le canal
             await this.client.leave();
             console.log('[AgoraWeb] Left channel');
         }
         async enableWebViewTransparency() {
             console.log('[AgoraWeb] enableWebViewTransparency called');
-            // Implémentation Web spécifique si applicable
             throw this.unimplemented('[AgoraWeb] enableWebViewTransparency is not implemented on the web.');
         }
         async disableWebViewTransparency() {
             console.log('[AgoraWeb] disableWebViewTransparency called');
-            // Implémentation Web spécifique si applicable
             throw this.unimplemented('[AgoraWeb] disableWebViewTransparency is not implemented on the web.');
         }
     }
