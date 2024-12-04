@@ -23,49 +23,51 @@ import UIKit
     agoraKit.enableVideo()
   }
 
-  public func requestPermissions(completion: @escaping (Bool) -> Void) {
-    let dispatchGroup = DispatchGroup()
-
-    var isCameraAccessGranted = false
-    var isMicrophoneAccessGranted = false
-
-    // Demande d'accès à la caméra
-    dispatchGroup.enter()
-    AVCaptureDevice.requestAccess(for: .video) { granted in
-      isCameraAccessGranted = granted
-      print("[Agora] Camera access \(granted ? "granted" : "denied")")
-      dispatchGroup.leave()
+    public func requestPermissionsSync() -> Bool {
+        return self.requestCameraAndMicrophoneAccessSync()
     }
 
-    // Demande d'accès au microphone
-    dispatchGroup.enter()
-    AVCaptureDevice.requestAccess(for: .audio) { granted in
-      isMicrophoneAccessGranted = granted
-      print("[Agora] Microphone access \(granted ? "granted" : "denied")")
-      dispatchGroup.leave()
-    }
+    private func requestCameraAndMicrophoneAccessSync() -> Bool {
+        // Vérifie si la caméra est déjà autorisée
+        let cameraStatus = AVCaptureDevice.authorizationStatus(for: .video)
+        let microphoneStatus = AVAudioSession.sharedInstance().recordPermission
 
-    // Après avoir vérifié les autorisations
-    dispatchGroup.notify(queue: .main) {
-      if isCameraAccessGranted && isMicrophoneAccessGranted {
-        completion(true)
-      } else {
-        self.openAppSettings()
-        completion(false)
-      }
-    }
-  }
-
-  private func openAppSettings() {
-    if let appSettingsURL = URL(string: UIApplication.openSettingsURLString) {
-      DispatchQueue.main.async {
-        if UIApplication.shared.canOpenURL(appSettingsURL) {
-          UIApplication.shared.open(appSettingsURL, options: [:], completionHandler: nil)
-          print("[Agora] Redirecting to app settings")
+        if cameraStatus == .authorized && microphoneStatus == .granted {
+            return true
         }
-      }
+
+        let semaphore = DispatchSemaphore(value: 0)
+        var accessGranted = false
+
+        // Demande l'accès à la caméra
+        AVCaptureDevice.requestAccess(for: .video) { cameraGranted in
+            if cameraGranted {
+                // Si la caméra est autorisée, demande l'accès au microphone
+                AVAudioSession.sharedInstance().requestRecordPermission { microphoneGranted in
+                    accessGranted = microphoneGranted
+                    semaphore.signal() // Libère le thread
+                }
+            } else {
+                semaphore.signal() // Libère le thread
+            }
+        }
+
+        semaphore.wait() // Bloque jusqu'à ce que le signal soit reçu
+        return accessGranted
     }
-  }
+
+
+    public func openAppSettings() {
+        if let appSettingsURL = URL(string: UIApplication.openSettingsURLString) {
+            DispatchQueue.main.async {
+                if UIApplication.shared.canOpenURL(appSettingsURL) {
+                    UIApplication.shared.open(appSettingsURL, options: [:], completionHandler: nil)
+                    print("[Agora] Redirecting to app settings")
+                }
+            }
+        }
+    }
+
 
   public func setupLocalVideo(in parentView: UIView) throws {
     guard let agoraKit = self.agoraKit else {

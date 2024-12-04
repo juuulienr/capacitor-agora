@@ -88,14 +88,22 @@ public class AgoraPlugin: CAPPlugin, CAPBridgedPlugin {
       call.resolve()
     }
   }
+    
 
-  @objc func requestPermissions(_ call: CAPPluginCall) {
-    implementation.requestPermissions { granted in
-      if granted {
-        call.resolve()
-      } else {
-        call.reject("Permissions not granted. User redirected to app settings.")
-      }
+    @objc public override func requestPermissions(_ call: CAPPluginCall) {
+        DispatchQueue.global(qos: .userInitiated).async {
+            let accessGranted = self.implementation.requestPermissionsSync()
+
+            DispatchQueue.main.async {
+                if accessGranted {
+                    call.resolve(["granted": true])
+                } else {
+                    self.implementation.openAppSettings()
+                    call.reject("Permissions not granted. User redirected to app settings.")
+                }
+            }
+        }
     }
-  }
+
+
 }
