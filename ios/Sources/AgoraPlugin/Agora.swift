@@ -1,6 +1,6 @@
 import AVFoundation
 import AgoraRtcKit
-import Foundation
+import UIKit
 
 /// Classe Agora qui encapsule la logique SDK d'Agora
 @objc public class Agora: NSObject {
@@ -21,6 +21,50 @@ import Foundation
     )
     agoraKit.setVideoEncoderConfiguration(videoConfig)
     agoraKit.enableVideo()
+  }
+
+  public func requestPermissions(completion: @escaping (Bool) -> Void) {
+    let dispatchGroup = DispatchGroup()
+
+    var isCameraAccessGranted = false
+    var isMicrophoneAccessGranted = false
+
+    // Demande d'accès à la caméra
+    dispatchGroup.enter()
+    AVCaptureDevice.requestAccess(for: .video) { granted in
+      isCameraAccessGranted = granted
+      print("[Agora] Camera access \(granted ? "granted" : "denied")")
+      dispatchGroup.leave()
+    }
+
+    // Demande d'accès au microphone
+    dispatchGroup.enter()
+    AVCaptureDevice.requestAccess(for: .audio) { granted in
+      isMicrophoneAccessGranted = granted
+      print("[Agora] Microphone access \(granted ? "granted" : "denied")")
+      dispatchGroup.leave()
+    }
+
+    // Après avoir vérifié les autorisations
+    dispatchGroup.notify(queue: .main) {
+      if isCameraAccessGranted && isMicrophoneAccessGranted {
+        completion(true)
+      } else {
+        self.openAppSettings()
+        completion(false)
+      }
+    }
+  }
+
+  private func openAppSettings() {
+    if let appSettingsURL = URL(string: UIApplication.openSettingsURLString) {
+      DispatchQueue.main.async {
+        if UIApplication.shared.canOpenURL(appSettingsURL) {
+          UIApplication.shared.open(appSettingsURL, options: [:], completionHandler: nil)
+          print("[Agora] Redirecting to app settings")
+        }
+      }
+    }
   }
 
   public func setupLocalVideo(in parentView: UIView) throws {
@@ -110,5 +154,4 @@ import Foundation
       print("[Agora] WebView transparency disabled in leaveChannel")
     }
   }
-
 }
