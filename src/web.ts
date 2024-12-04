@@ -105,4 +105,9 @@ export class AgoraWeb extends WebPlugin implements AgoraPlugin {
     console.log('[AgoraWeb] switchCamera called');
     throw this.unimplemented('[AgoraWeb] switchCamera is not implemented on the web.');
   }
+  
+  async requestPermissions(): Promise<void> {
+    console.log('[AgoraWeb] requestPermissions called');
+    throw this.unimplemented('[AgoraWeb] requestPermissions is not implemented on the web.');
+  }
 }

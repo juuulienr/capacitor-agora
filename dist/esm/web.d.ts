@@ -16,4 +16,5 @@ export declare class AgoraWeb extends WebPlugin implements AgoraPlugin {
     }): Promise<void>;
     leaveChannel(): Promise<void>;
     switchCamera(): Promise<void>;
+    requestPermissions(): Promise<void>;
 }

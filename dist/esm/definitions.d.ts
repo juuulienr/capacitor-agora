@@ -27,4 +27,9 @@ export interface AgoraPlugin {
      * Permet de basculer entre les caméras (avant/arrière).
      */
     switchCamera(): Promise<void>;
+    /**
+     * Demande les permissions pour accéder à la caméra et au microphone.
+     * Si les permissions sont refusées, redirige l'utilisateur vers les paramètres de l'application.
+     */
+    requestPermissions(): Promise<void>;
 }

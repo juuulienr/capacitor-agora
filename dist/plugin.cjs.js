@@ -95,6 +95,10 @@ class AgoraWeb extends core.WebPlugin {
         console.log('[AgoraWeb] switchCamera called');
         throw this.unimplemented('[AgoraWeb] switchCamera is not implemented on the web.');
     }
+    async requestPermissions() {
+        console.log('[AgoraWeb] requestPermissions called');
+        throw this.unimplemented('[AgoraWeb] requestPermissions is not implemented on the web.');
+    }
 }
 
 var web = /*#__PURE__*/Object.freeze({

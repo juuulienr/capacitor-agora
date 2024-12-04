@@ -76,6 +76,16 @@
         "docs": "Permet de basculer entre les caméras (avant/arrière).",
         "complexTypes": [],
         "slug": "switchcamera"
+      },
+      {
+        "name": "requestPermissions",
+        "signature": "() => Promise<void>",
+        "parameters": [],
+        "returns": "Promise<void>",
+        "tags": [],
+        "docs": "Demande les permissions pour accéder à la caméra et au microphone.\nSi les permissions sont refusées, redirige l'utilisateur vers les paramètres de l'application.",
+        "complexTypes": [],
+        "slug": "requestpermissions"
       }
     ],
     "properties": []

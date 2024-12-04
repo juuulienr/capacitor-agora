@@ -88,5 +88,9 @@ export class AgoraWeb extends WebPlugin {
         console.log('[AgoraWeb] switchCamera called');
         throw this.unimplemented('[AgoraWeb] switchCamera is not implemented on the web.');
     }
+    async requestPermissions() {
+        console.log('[AgoraWeb] requestPermissions called');
+        throw this.unimplemented('[AgoraWeb] requestPermissions is not implemented on the web.');
+    }
 }
 //# sourceMappingURL=web.js.map

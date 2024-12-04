@@ -18,6 +18,7 @@ npx cap sync
 * [`joinChannel(...)`](#joinchannel)
 * [`leaveChannel()`](#leavechannel)
 * [`switchCamera()`](#switchcamera)
+* [`requestPermissions()`](#requestpermissions)
 
 </docgen-index>
 
@@ -83,6 +84,18 @@ switchCamera() => Promise<void>
 ```
 
 Permet de basculer entre les caméras (avant/arrière).
+
+--------------------
+
+
+### requestPermissions()
+
+```typescript
+requestPermissions() => Promise<void>
+```
+
+Demande les permissions pour accéder à la caméra et au microphone.
+Si les permissions sont refusées, redirige l'utilisateur vers les paramètres de l'application.
 
 --------------------
 
