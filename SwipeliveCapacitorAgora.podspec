@@ -16,5 +16,5 @@ Pod::Spec.new do |s|
   s.swift_version = '5.1'
 
   # Ajouter la dépendance Agora
-  s.dependency 'AgoraRtcEngine_iOS', '4.3.2'
+  s.dependency 'AgoraRtcEngine_iOS', '4.5.0'
 end
