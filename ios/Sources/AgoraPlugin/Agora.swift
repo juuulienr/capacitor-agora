@@ -2,16 +2,14 @@ import AVFoundation
 import AgoraRtcKit
 import UIKit
 
-/// Classe Agora qui encapsule la logique SDK d'Agora
-@objc public class Agora: NSObject {
+@objc public class Agora: NSObject, AgoraRtcEngineDelegate {
   private var agoraKit: AgoraRtcEngineKit?
   private var localVideoView: UIView?
 
   public func initialize(appId: String) throws {
-    let agoraKit = AgoraRtcEngineKit.sharedEngine(withAppId: appId, delegate: nil)
+    let agoraKit = AgoraRtcEngineKit.sharedEngine(withAppId: appId, delegate: self)
     self.agoraKit = agoraKit
 
-    // Configure la qualité vidéo
     let videoConfig = AgoraVideoEncoderConfiguration(
       size: AgoraVideoDimension1920x1080,
       frameRate: .fps30,
@@ -19,55 +17,56 @@ import UIKit
       orientationMode: .fixedPortrait,
       mirrorMode: .disabled
     )
+    
     agoraKit.setVideoEncoderConfiguration(videoConfig)
-    agoraKit.enableVideo()
+    agoraKit.setLogFilter(AgoraLogFilter.debug.rawValue)
+
+    DispatchQueue.global(qos: .userInitiated).async {
+      agoraKit.enableVideo()
+      print("[Agora] Video enabled during initialization")
+    }
   }
 
-    public func requestPermissionsSync() -> Bool {
-        return self.requestCameraAndMicrophoneAccessSync()
+  public func requestPermissionsSync() -> Bool {
+    return self.requestCameraAndMicrophoneAccessSync()
+  }
+
+  private func requestCameraAndMicrophoneAccessSync() -> Bool {
+    let cameraStatus = AVCaptureDevice.authorizationStatus(for: .video)
+    let microphoneStatus = AVAudioSession.sharedInstance().recordPermission
+
+    if cameraStatus == .authorized && microphoneStatus == .granted {
+      return true
     }
 
-    private func requestCameraAndMicrophoneAccessSync() -> Bool {
-        // Vérifie si la caméra est déjà autorisée
-        let cameraStatus = AVCaptureDevice.authorizationStatus(for: .video)
-        let microphoneStatus = AVAudioSession.sharedInstance().recordPermission
+    let semaphore = DispatchSemaphore(value: 0)
+    var accessGranted = false
 
-        if cameraStatus == .authorized && microphoneStatus == .granted {
-            return true
+    AVCaptureDevice.requestAccess(for: .video) { cameraGranted in
+      if cameraGranted {
+        AVAudioSession.sharedInstance().requestRecordPermission { microphoneGranted in
+          accessGranted = microphoneGranted
+          semaphore.signal()
         }
-
-        let semaphore = DispatchSemaphore(value: 0)
-        var accessGranted = false
-
-        // Demande l'accès à la caméra
-        AVCaptureDevice.requestAccess(for: .video) { cameraGranted in
-            if cameraGranted {
-                // Si la caméra est autorisée, demande l'accès au microphone
-                AVAudioSession.sharedInstance().requestRecordPermission { microphoneGranted in
-                    accessGranted = microphoneGranted
-                    semaphore.signal() // Libère le thread
-                }
-            } else {
-                semaphore.signal() // Libère le thread
-            }
-        }
-
-        semaphore.wait() // Bloque jusqu'à ce que le signal soit reçu
-        return accessGranted
+      } else {
+        semaphore.signal()
+      }
     }
 
+    semaphore.wait()
+    return accessGranted
+  }
 
-    public func openAppSettings() {
-        if let appSettingsURL = URL(string: UIApplication.openSettingsURLString) {
-            DispatchQueue.main.async {
-                if UIApplication.shared.canOpenURL(appSettingsURL) {
-                    UIApplication.shared.open(appSettingsURL, options: [:], completionHandler: nil)
-                    print("[Agora] Redirecting to app settings")
-                }
-            }
+  public func openAppSettings() {
+    if let appSettingsURL = URL(string: UIApplication.openSettingsURLString) {
+      DispatchQueue.main.async {
+        if UIApplication.shared.canOpenURL(appSettingsURL) {
+          UIApplication.shared.open(appSettingsURL, options: [:], completionHandler: nil)
+          print("[Agora] Redirecting to app settings")
         }
+      }
     }
-
+  }
 
   public func setupLocalVideo(in parentView: UIView) throws {
     guard let agoraKit = self.agoraKit else {
@@ -76,27 +75,23 @@ import UIKit
     }
 
     DispatchQueue.main.async {
-      // Configure la nouvelle vue pour la vidéo locale
       self.localVideoView = UIView(frame: parentView.bounds)
-
-      // Ajoute la vue en arrière-plan
       parentView.insertSubview(self.localVideoView!, at: 0)
       parentView.isOpaque = false
       parentView.backgroundColor = .clear
       parentView.scrollView.backgroundColor = .clear
       print("[Agora] Inserted localVideoView behind ParentView content")
 
-      // Configure le rendu Agora
       let videoCanvas = AgoraRtcVideoCanvas()
       videoCanvas.view = self.localVideoView
       videoCanvas.uid = 0
       agoraKit.setupLocalVideo(videoCanvas)
       print("[Agora] Configured Agora video canvas")
 
-      // Démarre la prévisualisation
-      agoraKit.startPreview()
-      print("[Agora] Video preview started")
-      print("[Agora] WebView transparency enabled in setupLocalVideo")
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        agoraKit.startPreview()
+        print("[Agora] Video preview started")
+      }
     }
   }
 
@@ -106,13 +101,9 @@ import UIKit
         domain: "Agora", code: -1, userInfo: [NSLocalizedDescriptionKey: "Agora not initialized"])
     }
 
-    // Active l'audio et la vidéo (évite la popup plus tard)
-    agoraKit.muteLocalAudioStream(false)
-    agoraKit.muteLocalVideoStream(false)
     agoraKit.setClientRole(.broadcaster)
-
-    agoraKit.joinChannel(byToken: token, channelId: channelName, info: nil, uid: uid) {
-      [weak self] channel, uid, elapsed in
+    agoraKit.setChannelProfile(.liveBroadcasting)
+    agoraKit.joinChannel(byToken: token, channelId: channelName, info: nil, uid: uid) { channel, uid, elapsed in
       print("[Agora] Joined channel \(channel) with UID \(uid), elapsed \(elapsed) ms")
     }
   }
@@ -131,29 +122,44 @@ import UIKit
       return
     }
 
-    // Arrête la capture vidéo et désactive la vidéo
     agoraKit.stopPreview()
     agoraKit.enableLocalVideo(false)
     print("[Agora] Camera preview stopped and local video disabled")
 
-    // Désactive l’audio si nécessaire
     agoraKit.muteLocalAudioStream(true)
     print("[Agora] Local audio muted")
 
-    // Quitte le canal
     agoraKit.leaveChannel(nil)
     print("[Agora] Left channel")
 
     DispatchQueue.main.async {
-      // Supprime la vue locale
       self.localVideoView?.removeFromSuperview()
       self.localVideoView = nil
-
-      // Désactive la transparence des WebView
       parentView.isOpaque = true
       parentView.backgroundColor = .white
       parentView.scrollView.backgroundColor = .clear
       print("[Agora] WebView transparency disabled in leaveChannel")
     }
+  }
+
+  // Capture des logs et événements Agora dans la console
+  public func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
+    print("[Agora] Error occurred: \(errorCode.rawValue)")
+  }
+
+  public func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinChannel channel: String, withUid uid: UInt, elapsed: Int) {
+    print("[Agora] Joined channel \(channel) with UID \(uid), elapsed \(elapsed) ms")
+  }
+
+  public func rtcEngine(_ engine: AgoraRtcEngineKit, didLeaveChannelWith stats: AgoraChannelStats) {
+    print("[Agora] Left channel. Duration: \(stats.duration) seconds")
+  }
+
+  public func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurWarning warningCode: AgoraWarningCode) {
+    print("[Agora] Warning occurred: \(warningCode.rawValue)")
+  }
+
+  public func rtcEngine(_ engine: AgoraRtcEngineKit, reportRtcStats stats: AgoraChannelStats) {
+    print("[Agora] RTC stats: Duration \(stats.duration) seconds, Users \(stats.userCount), TX \(stats.txBytes) bytes, RX \(stats.rxBytes) bytes")
   }
 }
