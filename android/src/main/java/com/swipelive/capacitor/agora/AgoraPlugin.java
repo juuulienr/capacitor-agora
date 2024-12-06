@@ -1,27 +1,32 @@
-package com.example.agoraplugin;
+package com.swipelive.capacitor.agora;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.view.ViewGroup;
+
+import androidx.core.app.ActivityCompat;
 
 import com.getcapacitor.Plugin;
 import com.getcapacitor.Bridge;
+import com.getcapacitor.JSObject;
 import com.getcapacitor.PluginCall;
+import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
 import com.getcapacitor.annotation.PermissionCallback;
 
+
 @CapacitorPlugin(
-  name = "AgoraPlugin",
-  permissions = {
-    @Permission(alias = "camera", strings = {Manifest.permission.CAMERA}),
-    @Permission(alias = "microphone", strings = {Manifest.permission.RECORD_AUDIO})
-  }
+        name = "Agora",
+        permissions = {
+                @Permission(alias = "camera", strings = {Manifest.permission.CAMERA}),
+                @Permission(alias = "microphone", strings = {Manifest.permission.RECORD_AUDIO})
+        }
 )
 public class AgoraPlugin extends Plugin {
   private final Agora implementation = new Agora();
 
-  @PluginMethod
   public void initialize(PluginCall call) {
     String appId = call.getString("appId");
     if (appId == null || appId.isEmpty()) {
@@ -36,9 +41,8 @@ public class AgoraPlugin extends Plugin {
     }
   }
 
-  @PluginMethod
   public void requestPermissions(PluginCall call) {
-    if (!implementation.requestPermissions(getContext())) {
+    if (!hasAllPermissions(getContext())) {
       requestAllPermissions(call, "handlePermissionsCallback");
     } else {
       call.resolve();
@@ -47,7 +51,7 @@ public class AgoraPlugin extends Plugin {
 
   @PermissionCallback
   private void handlePermissionsCallback(PluginCall call) {
-    if (PermissionUtils.hasAllPermissions(getContext())) {
+    if (hasAllPermissions(getContext())) {
       call.resolve();
     } else {
       implementation.openAppSettings(getContext());
@@ -55,7 +59,11 @@ public class AgoraPlugin extends Plugin {
     }
   }
 
-  @PluginMethod
+  private boolean hasAllPermissions(Context context) {
+    return ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+            && ActivityCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
+  }
+
   public void setupLocalVideo(PluginCall call) {
     try {
       Bridge bridge = getBridge();
@@ -69,7 +77,6 @@ public class AgoraPlugin extends Plugin {
     }
   }
 
-  @PluginMethod
   public void joinChannel(PluginCall call) {
     String channelName = call.getString("channelName");
     String token = call.getString("token");
@@ -88,7 +95,6 @@ public class AgoraPlugin extends Plugin {
     }
   }
 
-  @PluginMethod
   public void switchCamera(PluginCall call) {
     try {
       implementation.switchCamera();
@@ -98,7 +104,6 @@ public class AgoraPlugin extends Plugin {
     }
   }
 
-  @PluginMethod
   public void leaveChannel(PluginCall call) {
     Bridge bridge = getBridge();
     ViewGroup parentView = (ViewGroup) bridge.getActivity().findViewById(android.R.id.content);

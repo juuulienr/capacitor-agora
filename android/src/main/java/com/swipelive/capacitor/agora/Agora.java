@@ -1,7 +1,8 @@
-package com.example.agoraplugin;
+package com.swipelive.capacitor.agora;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.SurfaceView;
@@ -41,10 +42,10 @@ public class Agora {
     });
 
     VideoEncoderConfiguration config = new VideoEncoderConfiguration(
-      VideoEncoderConfiguration.VD_1920x1080,
-      VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_30,
-      VideoEncoderConfiguration.STANDARD_BITRATE,
-      VideoEncoderConfiguration.ORIENTATION_MODE.ORIENTATION_MODE_FIXED_PORTRAIT
+            VideoEncoderConfiguration.VD_1920x1080,
+            VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_30,
+            VideoEncoderConfiguration.STANDARD_BITRATE,
+            VideoEncoderConfiguration.ORIENTATION_MODE.ORIENTATION_MODE_FIXED_PORTRAIT
     );
 
     agoraEngine.setVideoEncoderConfiguration(config);
@@ -52,13 +53,14 @@ public class Agora {
     Log.i(TAG, "Agora video enabled and initialized");
   }
 
-  public boolean requestPermissions(Context context) {
-    return PermissionUtils.checkAndRequestPermissions(context);
+  public boolean hasAllPermissions(Context context) {
+    return context.checkSelfPermission(android.Manifest.permission.CAMERA) == android.content.pm.PackageManager.PERMISSION_GRANTED &&
+            context.checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) == android.content.pm.PackageManager.PERMISSION_GRANTED;
   }
 
   public void openAppSettings(Context context) {
     Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-    intent.setData(Settings.ACTION_APPLICATION_DETAILS_SETTINGS.parse("package:" + context.getPackageName()));
+    intent.setData(Uri.parse("package:" + context.getPackageName()));
     context.startActivity(intent);
   }
 
@@ -67,10 +69,10 @@ public class Agora {
       throw new IllegalStateException("Agora engine not initialized");
     }
 
-    SurfaceView localVideoView = RtcEngine.CreateRendererView(context);
+    SurfaceView localVideoView = new SurfaceView(context);
     localVideoContainer = new FrameLayout(context);
     localVideoContainer.addView(localVideoView, new FrameLayout.LayoutParams(
-      FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+            FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
     parentView.addView(localVideoContainer);
 
     VideoCanvas videoCanvas = new VideoCanvas(localVideoView, VideoCanvas.RENDER_MODE_HIDDEN, 0);
