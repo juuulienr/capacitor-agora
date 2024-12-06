@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.view.ViewGroup;
 
+import com.getcapacitor.Plugin;
 import com.getcapacitor.Bridge;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.annotation.CapacitorPlugin;
