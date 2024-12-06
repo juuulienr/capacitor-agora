@@ -42,26 +42,11 @@ public class AgoraPlugin extends Plugin {
   }
 
   public void requestPermissions(PluginCall call) {
-    if (!hasAllPermissions(getContext())) {
-      requestAllPermissions(call, "handlePermissionsCallback");
+    if (implementation.requestPermissions(getContext())) {
+        call.resolve();
     } else {
-      call.resolve();
+        call.reject("Permissions required");
     }
-  }
-
-  @PermissionCallback
-  private void handlePermissionsCallback(PluginCall call) {
-    if (hasAllPermissions(getContext())) {
-      call.resolve();
-    } else {
-      implementation.openAppSettings(getContext());
-      call.reject("Permissions not granted. Redirected to app settings.");
-    }
-  }
-
-  private boolean hasAllPermissions(Context context) {
-    return ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
-            && ActivityCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
   }
 
   public void setupLocalVideo(PluginCall call) {

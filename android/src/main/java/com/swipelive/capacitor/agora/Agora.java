@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import android.content.pm.PackageManager;
 
 import io.agora.rtc2.*;
 import io.agora.rtc2.video.VideoCanvas;
@@ -42,10 +44,10 @@ public class Agora {
     });
 
     VideoEncoderConfiguration config = new VideoEncoderConfiguration(
-            VideoEncoderConfiguration.VD_1920x1080,
-            VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_30,
-            VideoEncoderConfiguration.STANDARD_BITRATE,
-            VideoEncoderConfiguration.ORIENTATION_MODE.ORIENTATION_MODE_FIXED_PORTRAIT
+      VideoEncoderConfiguration.VD_1920x1080,
+      VideoEncoderConfiguration.FRAME_RATE.FRAME_RATE_FPS_30,
+      VideoEncoderConfiguration.STANDARD_BITRATE,
+      VideoEncoderConfiguration.ORIENTATION_MODE.ORIENTATION_MODE_FIXED_PORTRAIT
     );
 
     agoraEngine.setVideoEncoderConfiguration(config);
@@ -54,8 +56,26 @@ public class Agora {
   }
 
   public boolean hasAllPermissions(Context context) {
-    return context.checkSelfPermission(android.Manifest.permission.CAMERA) == android.content.pm.PackageManager.PERMISSION_GRANTED &&
-            context.checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) == android.content.pm.PackageManager.PERMISSION_GRANTED;
+    return context.checkSelfPermission(android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED &&
+           context.checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
+  }
+
+  public boolean requestPermissions(Context context) {
+    if (hasAllPermissions(context)) {
+      Log.i(TAG, "All permissions are already granted");
+      return true;
+    }
+
+    Log.i(TAG, "Requesting camera and microphone permissions");
+    ActivityCompat.requestPermissions(
+      (android.app.Activity) context,
+      new String[]{
+        android.Manifest.permission.CAMERA,
+        android.Manifest.permission.RECORD_AUDIO
+      },
+      1 // Request code arbitraire pour identifier la demande
+    );
+    return false;
   }
 
   public void openAppSettings(Context context) {
@@ -72,7 +92,7 @@ public class Agora {
     SurfaceView localVideoView = new SurfaceView(context);
     localVideoContainer = new FrameLayout(context);
     localVideoContainer.addView(localVideoView, new FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+      FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
     parentView.addView(localVideoContainer);
 
     VideoCanvas videoCanvas = new VideoCanvas(localVideoView, VideoCanvas.RENDER_MODE_HIDDEN, 0);
