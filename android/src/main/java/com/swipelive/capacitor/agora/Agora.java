@@ -1,8 +1,10 @@
 package com.swipelive.capacitor.agora;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.SurfaceView;
@@ -56,9 +58,13 @@ public class Agora {
   }
 
   public boolean hasAllPermissions(Context context) {
-    return context.checkSelfPermission(android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED &&
-           context.checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      return context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED &&
+              context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
+    }
+    return true;
   }
+
 
   public boolean requestPermissions(Context context) {
     if (hasAllPermissions(context)) {

@@ -18,11 +18,11 @@ import com.getcapacitor.annotation.PermissionCallback;
 
 
 @CapacitorPlugin(
-        name = "Agora",
-        permissions = {
-                @Permission(alias = "camera", strings = {Manifest.permission.CAMERA}),
-                @Permission(alias = "microphone", strings = {Manifest.permission.RECORD_AUDIO})
-        }
+  name = "Agora",
+  permissions = {
+    @Permission(alias = "camera", strings = {Manifest.permission.CAMERA}),
+    @Permission(alias = "microphone", strings = {Manifest.permission.RECORD_AUDIO})
+  }
 )
 public class AgoraPlugin extends Plugin {
   private final Agora implementation = new Agora();
