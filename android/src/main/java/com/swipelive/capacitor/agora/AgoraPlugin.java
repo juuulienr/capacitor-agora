@@ -27,6 +27,7 @@ import com.getcapacitor.annotation.PermissionCallback;
 public class AgoraPlugin extends Plugin {
   private final Agora implementation = new Agora();
 
+  @PluginMethod
   public void initialize(PluginCall call) {
     String appId = call.getString("appId");
     if (appId == null || appId.isEmpty()) {
@@ -41,6 +42,7 @@ public class AgoraPlugin extends Plugin {
     }
   }
 
+  @PluginMethod
   public void requestPermissions(PluginCall call) {
     if (implementation.requestPermissions(getContext())) {
         call.resolve();
@@ -49,6 +51,7 @@ public class AgoraPlugin extends Plugin {
     }
   }
 
+  @PluginMethod
   public void setupLocalVideo(PluginCall call) {
     try {
       Bridge bridge = getBridge();
@@ -62,6 +65,7 @@ public class AgoraPlugin extends Plugin {
     }
   }
 
+  @PluginMethod
   public void joinChannel(PluginCall call) {
     String channelName = call.getString("channelName");
     String token = call.getString("token");
@@ -80,6 +84,7 @@ public class AgoraPlugin extends Plugin {
     }
   }
 
+  @PluginMethod
   public void switchCamera(PluginCall call) {
     try {
       implementation.switchCamera();
@@ -89,6 +94,7 @@ public class AgoraPlugin extends Plugin {
     }
   }
 
+  @PluginMethod
   public void leaveChannel(PluginCall call) {
     Bridge bridge = getBridge();
     ViewGroup parentView = (ViewGroup) bridge.getActivity().findViewById(android.R.id.content);
