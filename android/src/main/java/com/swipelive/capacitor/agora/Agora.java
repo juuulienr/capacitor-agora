@@ -58,30 +58,8 @@ public class Agora {
   }
 
   public boolean hasAllPermissions(Context context) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      return context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED &&
-              context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
-    }
-    return true;
-  }
-
-
-  public boolean requestPermissions(Context context) {
-    if (hasAllPermissions(context)) {
-      Log.i(TAG, "All permissions are already granted");
-      return true;
-    }
-
-    Log.i(TAG, "Requesting camera and microphone permissions");
-    ActivityCompat.requestPermissions(
-      (android.app.Activity) context,
-      new String[]{
-        android.Manifest.permission.CAMERA,
-        android.Manifest.permission.RECORD_AUDIO
-      },
-      1 // Request code arbitraire pour identifier la demande
-    );
-    return false;
+    return context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED &&
+            context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
   }
 
   public void openAppSettings(Context context) {
@@ -96,16 +74,34 @@ public class Agora {
     }
 
     SurfaceView localVideoView = new SurfaceView(context);
-    localVideoContainer = new FrameLayout(context);
-    localVideoContainer.addView(localVideoView, new FrameLayout.LayoutParams(
-      FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-    parentView.addView(localVideoContainer);
 
-    VideoCanvas videoCanvas = new VideoCanvas(localVideoView, VideoCanvas.RENDER_MODE_HIDDEN, 0);
-    agoraEngine.setupLocalVideo(videoCanvas);
-    agoraEngine.startPreview();
+    android.os.Handler mainHandler = new android.os.Handler(context.getMainLooper());
+    mainHandler.post(() -> {
+      try {
+        // Créer un conteneur pour la vidéo
+        FrameLayout localVideoContainer = new FrameLayout(context);
+        localVideoContainer.setLayoutParams(new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+        ));
 
-    Log.i(TAG, "Local video view initialized and preview started");
+        localVideoView.setZOrderOnTop(false);
+        localVideoView.setZOrderMediaOverlay(false);
+
+        // Ajouter la vidéo Agora derrière la vue principale
+        localVideoContainer.addView(localVideoView);
+        parentView.addView(localVideoContainer, 0); // Ajouter en arrière-plan
+
+        // Configurer la vidéo locale pour Agora
+        VideoCanvas videoCanvas = new VideoCanvas(localVideoView, VideoCanvas.RENDER_MODE_HIDDEN, 0);
+        agoraEngine.setupLocalVideo(videoCanvas);
+        agoraEngine.startPreview();
+
+        Log.i(TAG, "Local video view initialized and preview started");
+      } catch (Exception e) {
+        Log.e(TAG, "Failed to setup local video", e);
+      }
+    });
   }
 
   public void joinChannel(String channelName, String token, int uid) throws Exception {

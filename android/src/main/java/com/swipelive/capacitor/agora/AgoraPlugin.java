@@ -44,12 +44,25 @@ public class AgoraPlugin extends Plugin {
 
   @PluginMethod
   public void requestPermissions(PluginCall call) {
-    if (implementation.requestPermissions(getContext())) {
-        call.resolve();
+    if (implementation.hasAllPermissions(getContext())) {
+      JSObject ret = new JSObject();
+      ret.put("granted", true);
+      call.resolve(ret);
     } else {
-        call.reject("Permissions required");
+      ActivityCompat.requestPermissions(
+              getActivity(),
+              new String[]{
+                      Manifest.permission.CAMERA,
+                      Manifest.permission.RECORD_AUDIO
+              },
+              1
+      );
+      JSObject ret = new JSObject();
+      ret.put("granted", false);
+      call.resolve(ret);
     }
   }
+
 
   @PluginMethod
   public void setupLocalVideo(PluginCall call) {
@@ -58,12 +71,16 @@ public class AgoraPlugin extends Plugin {
       Context context = getContext();
       ViewGroup parentView = (ViewGroup) bridge.getActivity().findViewById(android.R.id.content);
 
+      // Configure la transparence de la WebView avant d'ajouter la vidéo
+      bridge.getWebView().setBackgroundColor(android.graphics.Color.TRANSPARENT);
+
       implementation.setupLocalVideo(context, parentView);
       call.resolve();
     } catch (Exception e) {
       call.reject("Failed to setup local video", e);
     }
   }
+
 
   @PluginMethod
   public void joinChannel(PluginCall call) {
