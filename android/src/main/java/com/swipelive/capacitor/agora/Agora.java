@@ -81,8 +81,8 @@ public class Agora {
         // Créer un conteneur pour la vidéo
         FrameLayout localVideoContainer = new FrameLayout(context);
         localVideoContainer.setLayoutParams(new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT
+          FrameLayout.LayoutParams.MATCH_PARENT,
+          FrameLayout.LayoutParams.MATCH_PARENT
         ));
 
         localVideoView.setZOrderOnTop(false);
@@ -90,7 +90,7 @@ public class Agora {
 
         // Ajouter la vidéo Agora derrière la vue principale
         localVideoContainer.addView(localVideoView);
-        parentView.addView(localVideoContainer, 0); // Ajouter en arrière-plan
+        parentView.addView(localVideoContainer, 0);
 
         // Configurer la vidéo locale pour Agora
         VideoCanvas videoCanvas = new VideoCanvas(localVideoView, VideoCanvas.RENDER_MODE_HIDDEN, 0);

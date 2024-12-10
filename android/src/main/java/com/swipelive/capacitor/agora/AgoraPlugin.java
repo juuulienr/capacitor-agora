@@ -50,12 +50,12 @@ public class AgoraPlugin extends Plugin {
       call.resolve(ret);
     } else {
       ActivityCompat.requestPermissions(
-              getActivity(),
-              new String[]{
-                      Manifest.permission.CAMERA,
-                      Manifest.permission.RECORD_AUDIO
-              },
-              1
+        getActivity(),
+        new String[]{
+          Manifest.permission.CAMERA,
+          Manifest.permission.RECORD_AUDIO
+        },
+        1
       );
       JSObject ret = new JSObject();
       ret.put("granted", false);
@@ -73,7 +73,6 @@ public class AgoraPlugin extends Plugin {
 
       // Configure la transparence de la WebView avant d'ajouter la vidéo
       bridge.getWebView().setBackgroundColor(android.graphics.Color.TRANSPARENT);
-
       implementation.setupLocalVideo(context, parentView);
       call.resolve();
     } catch (Exception e) {
