@@ -1,102 +1,119 @@
 # @swipelive/capacitor-agora
 
-Capacitor plugin for integrating Agora
+Plugin Capacitor pour l'intégration d'Agora dans vos applications mobiles. Ce plugin permet d'implémenter facilement des fonctionnalités de streaming vidéo et audio en temps réel grâce à la plateforme Agora.
 
-## Install
+## 📋 Prérequis
+
+- Capacitor 5.0 ou supérieur
+- Un compte Agora avec un App ID valide
+- iOS 13.0 ou supérieur
+- Android API level 21 ou supérieur
+
+## 💻 Installation
 
 ```bash
 npm install @swipelive/capacitor-agora
 npx cap sync
 ```
 
-## API
+## 🔑 Configuration
 
-<docgen-index>
+### Android
 
-* [`initialize(...)`](#initialize)
-* [`setupLocalVideo()`](#setuplocalvideo)
-* [`joinChannel(...)`](#joinchannel)
-* [`leaveChannel()`](#leavechannel)
-* [`switchCamera()`](#switchcamera)
-* [`requestPermissions()`](#requestpermissions)
+Aucune configuration supplémentaire n'est nécessaire pour Android.
 
-</docgen-index>
+### iOS
 
-<docgen-api>
-<!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
+Ajoutez les permissions suivantes dans votre fichier `Info.plist` :
 
-### initialize(...)
-
-```typescript
-initialize(options: { appId: string; }) => Promise<void>
+```xml
+<key>NSCameraUsageDescription</key>
+<string>L'accès à la caméra est nécessaire pour les appels vidéo</string>
+<key>NSMicrophoneUsageDescription</key>
+<string>L'accès au microphone est nécessaire pour les appels audio</string>
 ```
 
-Initialise le SDK Agora avec l'App ID.
+## 📚 API
 
-| Param         | Type                            | Description                       |
-| ------------- | ------------------------------- | --------------------------------- |
-| **`options`** | <code>{ appId: string; }</code> | - Les options contenant l'App ID. |
-
---------------------
-
-
-### setupLocalVideo()
+### Initialisation
 
 ```typescript
-setupLocalVideo() => Promise<void>
+initialize({ appId: string }): Promise<void>
 ```
+Initialise le SDK Agora avec votre App ID.
 
+### Configuration Vidéo
+
+```typescript
+setupLocalVideo(): Promise<void>
+```
 Configure et affiche la vidéo locale.
 
---------------------
-
-
-### joinChannel(...)
+### Gestion des Canaux
 
 ```typescript
-joinChannel(options: { channelName: string; token: string | null; uid: number; }) => Promise<void>
+joinChannel({ 
+  channelName: string, 
+  token: string | null, 
+  uid: number 
+}): Promise<void>
 ```
-
-Rejoint un canal Agora avec les informations fournies.
-
-| Param         | Type                                                                      | Description                                                  |
-| ------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| **`options`** | <code>{ channelName: string; token: string \| null; uid: number; }</code> | - Les options contenant le nom du canal, le token, et l'UID. |
-
---------------------
-
-
-### leaveChannel()
+Rejoint un canal Agora avec les paramètres spécifiés.
 
 ```typescript
-leaveChannel() => Promise<void>
+leaveChannel(): Promise<void>
 ```
-
 Quitte le canal actuel et libère les ressources.
 
---------------------
-
-
-### switchCamera()
+### Contrôles Caméra
 
 ```typescript
-switchCamera() => Promise<void>
+switchCamera(): Promise<void>
 ```
+Bascule entre les caméras avant et arrière.
 
-Permet de basculer entre les caméras (avant/arrière).
-
---------------------
-
-
-### requestPermissions()
+### Permissions
 
 ```typescript
-requestPermissions() => Promise<void>
+requestPermissions(): Promise<void>
+```
+Demande les permissions nécessaires pour la caméra et le microphone.
+
+## 🚀 Exemple d'utilisation
+
+```typescript
+import { CapacitorAgora } from '@swipelive/capacitor-agora';
+
+// Initialisation
+await CapacitorAgora.initialize({ appId: 'VOTRE_APP_ID' });
+
+// Demande des permissions
+await CapacitorAgora.requestPermissions();
+
+// Configuration de la vidéo locale
+await CapacitorAgora.setupLocalVideo();
+
+// Rejoindre un canal
+await CapacitorAgora.joinChannel({
+  channelName: 'mon-canal',
+  token: null, // ou votre token si la sécurité est activée
+  uid: 0
+});
+
+// Quitter le canal
+await CapacitorAgora.leaveChannel();
 ```
 
-Demande les permissions pour accéder à la caméra et au microphone.
-Si les permissions sont refusées, redirige l'utilisateur vers les paramètres de l'application.
+## 📝 Notes
 
---------------------
+- Assurez-vous d'avoir les permissions nécessaires avant d'initialiser la vidéo
+- Gérez correctement le cycle de vie de votre application en quittant le canal lorsque nécessaire
+- Pour la production, utilisez toujours un token Agora valide
 
-</docgen-api>
+## 🤝 Contribution
+
+Les contributions sont les bienvenues ! N'hésitez pas à ouvrir une issue ou une pull request.
+
+## 📄 Licence
+
+MIT
