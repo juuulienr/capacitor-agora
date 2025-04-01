@@ -110,10 +110,6 @@ await CapacitorAgora.leaveChannel();
 - Gérez correctement le cycle de vie de votre application en quittant le canal lorsque nécessaire
 - Pour la production, utilisez toujours un token Agora valide
 
-## 🤝 Contribution
-
-Les contributions sont les bienvenues ! N'hésitez pas à ouvrir une issue ou une pull request.
-
 ## 📄 Licence
 
 MIT
